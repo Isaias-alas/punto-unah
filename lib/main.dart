@@ -2,78 +2,64 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
-void main() {
-  runApp(const MyApp());
-}
+void main() => runApp(const MyApp());
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
-    return MaterialApp( // Usa MaterialApp como widget raíz
-      title: 'Mapa UNAH',
-      theme: ThemeData(
-        primarySwatch: Colors.blue, // Puedes personalizar el tema
-      ),
-      home: const MapScreen(), // Crea una nueva pantalla para tu mapa
+    return MaterialApp(
+      title: 'Mapa UNAH‑VS',
+      theme: ThemeData(primarySwatch: Colors.blue),
+      home: const MapScreen(),
     );
   }
 }
 
 class MapScreen extends StatelessWidget {
   const MapScreen({super.key});
-
   @override
   Widget build(BuildContext context) {
+    // 1. Definir límites del campus UNAH‑VS
+    final campusBounds = LatLngBounds(
+      const LatLng(15.527346, -88.039573), // Suroeste
+      const LatLng(15.531895, -88.035293), // Noreste
+    );
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Mapa UNAH'),
-      ),
+      appBar: AppBar(title: const Text('Mapa UNAH‑VS')),
       body: FlutterMap(
         options: MapOptions(
-          initialCenter: LatLng(15.4778, -87.9939),
-          initialZoom: 15.0,
+          // 2. Centrado inicial
+          initialCenter: const LatLng(15.529605, -88.037299),
+          initialZoom: 16.0,
+
+          // 3. Restricción permanente al área del campus
+          cameraConstraint: CameraConstraint.contain(bounds: campusBounds),
+
+          // 4. Límites de zoom permitidos
+          minZoom: 14.0,
+          maxZoom: 18.0,
+
+          // 5. Gestos habilitados (pan + zoom, sin rotación)
+          interactionOptions: const InteractionOptions(
+            flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
+          ),
         ),
         children: [
           TileLayer(
             urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-            subdomains: ['a', 'b', 'c'],
+            subdomains: const ['a', 'b', 'c'],
           ),
-          MarkerLayer(
-  markers: [
-    Marker(
-      width: 80.0, // Es bueno definir un tamaño
-      height: 80.0,
-      point: LatLng(15.4678, -87.9918), // La coordenada del marcador
-      // --- PARÁMETRO 'child' REQUERIDO ---
-      child: Icon(
-        Icons.location_pin, // El icono que quieres mostrar
-        color: Colors.red,   // Puedes darle color
-        size: 45.0,          // Y tamaño
-      ),
-      // --- Fin del parámetro 'child' ---
-    ),
-    Marker(
-      width: 80.0,
-      height: 80.0,
-      point: LatLng(15.4688, -87.9928), // Otra coordenada
-      // --- Añadir 'child' aquí también ---
-      child: Icon(
-        Icons.school,
-        color: Colors.blue,
-        size: 45.0,
-      ),
-      // --- Fin del parámetro 'child' ---
-    ),
-    // ... Asegúrate de que TODOS tus Markers tengan el parámetro 'child'
-  ],
-),
+          // Aquí puedes agregar MarkerLayer, PolygonLayer, etc.
         ],
       ),
     );
   }
 }
+
+
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
