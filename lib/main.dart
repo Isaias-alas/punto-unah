@@ -18,14 +18,43 @@ class MyApp extends StatelessWidget {
     ),
     body: FlutterMap(
       options: MapOptions(
-        initialCenter: LatLng(15.4678, -87.9918),
+        initialCenter: LatLng(15.529838, -88.037149),
         initialZoom: 15.0,
       ),
       children: [
         TileLayer(
           urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
           subdomains: ['a', 'b', 'c'],
-          ),
+        ),
+        MarkerLayer(
+  markers: [
+    Marker(
+      width: 80.0, // Es bueno definir un tamaño
+      height: 80.0,
+      point: LatLng(15.529838, -88.037149), // La coordenada del marcador
+      // --- PARÁMETRO 'child' REQUERIDO ---
+      child: Icon(
+        Icons.location_pin, // El icono que quieres mostrar
+        color: Colors.red,   // Puedes darle color
+        size: 45.0,          // Y tamaño
+      ),
+      // --- Fin del parámetro 'child' ---
+    ),
+    Marker(
+      width: 80.0,
+      height: 80.0,
+      point: LatLng(15.529838, -88.037149), // Otra coordenada
+      // --- Añadir 'child' aquí también ---
+      child: Icon(
+        Icons.school,
+        color: Colors.blue,
+        size: 45.0,
+      ),
+      // --- Fin del parámetro 'child' ---
+    ),
+    // ... Asegúrate de que TODOS tus Markers tengan el parámetro 'child'
+  ],
+),
        ],
       ),
     );
