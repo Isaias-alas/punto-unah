@@ -1,6 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart'; // Importante para las coordenadas
-import 'package:flutter/material.dart'; // Importante para los widgets
+import 'package:latlong2/latlong.dart';
 
 void main() {
   runApp(const MyApp());
@@ -9,29 +9,43 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-  return Scaffold(
-    appBar: AppBar(
-      title: Text('Mapa UNAH'),
-    ),
-    body: FlutterMap(
-      options: MapOptions(
-        initialCenter: LatLng(15.529838, -88.037149),
-        initialZoom: 15.0,
+    return MaterialApp( // Usa MaterialApp como widget raíz
+      title: 'Mapa UNAH',
+      theme: ThemeData(
+        primarySwatch: Colors.blue, // Puedes personalizar el tema
       ),
-      children: [
-        TileLayer(
-          urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-          subdomains: ['a', 'b', 'c'],
+      home: const MapScreen(), // Crea una nueva pantalla para tu mapa
+    );
+  }
+}
+
+class MapScreen extends StatelessWidget {
+  const MapScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Mapa UNAH'),
+      ),
+      body: FlutterMap(
+        options: MapOptions(
+          initialCenter: LatLng(15.4778, -87.9939),
+          initialZoom: 15.0,
         ),
-        MarkerLayer(
+        children: [
+          TileLayer(
+            urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+            subdomains: ['a', 'b', 'c'],
+          ),
+          MarkerLayer(
   markers: [
     Marker(
       width: 80.0, // Es bueno definir un tamaño
       height: 80.0,
-      point: LatLng(15.529838, -88.037149), // La coordenada del marcador
+      point: LatLng(15.4678, -87.9918), // La coordenada del marcador
       // --- PARÁMETRO 'child' REQUERIDO ---
       child: Icon(
         Icons.location_pin, // El icono que quieres mostrar
@@ -43,7 +57,7 @@ class MyApp extends StatelessWidget {
     Marker(
       width: 80.0,
       height: 80.0,
-      point: LatLng(15.529838, -88.037149), // Otra coordenada
+      point: LatLng(15.4688, -87.9928), // Otra coordenada
       // --- Añadir 'child' aquí también ---
       child: Icon(
         Icons.school,
@@ -55,7 +69,7 @@ class MyApp extends StatelessWidget {
     // ... Asegúrate de que TODOS tus Markers tengan el parámetro 'child'
   ],
 ),
-       ],
+        ],
       ),
     );
   }
