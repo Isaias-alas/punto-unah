@@ -1,18 +1,102 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:flutter/services.dart';
 
 void main() => runApp(const MyApp());
 
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Mapa UNAH‑VS',
+      title: 'UNAH-VS Navigator',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: const MapScreen(),
+      home: const WelcomeScreen(),
+    );
+  }
+}
+
+class WelcomeScreen extends StatefulWidget {
+  const WelcomeScreen({super.key});
+
+  @override
+  State<WelcomeScreen> createState() => _WelcomeScreenState();
+}
+
+class _WelcomeScreenState extends State<WelcomeScreen> {
+  final TextEditingController _buildingController = TextEditingController();
+  final TextEditingController _classroomController = TextEditingController();
+
+  @override
+  void dispose() {
+    _buildingController.dispose();
+    _classroomController.dispose();
+    super.dispose();
+  }
+
+  void _navigateToMapScreen() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const MapScreen()),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Bienvenido a UNAH-VS'),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Image.asset(
+              'web/favicon.png', // Assuming you have the logo here
+              width: 150,
+              height: 150,
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: 200,
+              child: TextField(
+                controller: _buildingController,
+                keyboardType: TextInputType.number,
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  FilteringTextInputFormatter.allow(RegExp(r'[1-6]')),
+                ],
+                decoration: const InputDecoration(
+                  labelText: 'Edificio (1-6)',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            SizedBox(
+              width: 200,
+              child: TextField(
+                controller: _classroomController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: 'Aula',
+                  hintText: _buildingController.text == '6'
+                      ? 'Ingrese cualquier número'
+                      : 'Piso-Aula (ej. 101)',
+                  border: const OutlineInputBorder(),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _navigateToMapScreen,
+              child: const Text('Ir'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -21,14 +105,14 @@ class MapScreen extends StatelessWidget {
   const MapScreen({super.key});
   @override
   Widget build(BuildContext context) {
-    // 1. Definir límites del campus UNAH‑VS
+    // 1. Definir límites del campus UNAH-VS
     final campusBounds = LatLngBounds(
       const LatLng(15.527346, -88.039573), // Suroeste
       const LatLng(15.531895, -88.035293), // Noreste
     );
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Mapa UNAH‑VS')),
+      appBar: AppBar(title: const Text('Mapa UNAH-VS')),
       body: FlutterMap(
         options: MapOptions(
           // 2. Centrado inicial
@@ -59,27 +143,26 @@ class MapScreen extends StatelessWidget {
   }
 }
 
-
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
+class MyApp2 extends StatelessWidget {
+  const MyApp2({super.key});
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Mapa UNAH‑VS',
+      theme: ThemeData(primarySwatch: Colors.blue),
+      home: const MapScreen(),
+    );
+  }
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class MyHomePage2 extends StatefulWidget {
+  const MyHomePage2({super.key, required this.title});
+  final String title;
+  @override
+  State<MyHomePage2> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage2> {
   int _counter = 0;
 
   void _incrementCounter() {
@@ -96,16 +179,12 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
+    // by the _incrementCounter method above. The Flutter framework has been
+    // optimized to make rerunning build methods fast, so that you can just
+    // rebuild anything that needs updating rather than having to individually
+    // change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
@@ -113,21 +192,9 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
+        // in the middle of the parent
         child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
+          // Column is also a layout widget. It takes a list of children and arranges them vertically.
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             const Text('You have pushed the button this many times:'),
@@ -142,7 +209,7 @@ class _MyHomePageState extends State<MyHomePage> {
         onPressed: _incrementCounter,
         tooltip: 'Increment',
         child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      ),
     );
   }
 }
