@@ -28,6 +28,7 @@ class WelcomeScreen extends StatefulWidget {
 class _WelcomeScreenState extends State<WelcomeScreen> {
   final TextEditingController _buildingController = TextEditingController();
   final TextEditingController _classroomController = TextEditingController();
+  int? _edificioSeleccionado;
 
   @override
   void dispose() {
@@ -45,6 +46,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    String hintAula = _edificioSeleccionado == 6
+        ? 'Ingrese cualquier número'
+        : 'Piso-Aula (ej. 101)';
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Bienvenido a UNAH-VS'),
@@ -54,24 +59,31 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Image.asset(
-              'web/favicon.png', // Assuming you have the logo here
+              'web/campus.png',
               width: 150,
               height: 150,
             ),
             const SizedBox(height: 20),
             SizedBox(
               width: 200,
-              child: TextField(
-                controller: _buildingController,
-                keyboardType: TextInputType.number,
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly,
-                  FilteringTextInputFormatter.allow(RegExp(r'[1-6]')),
-                ],
+              child: DropdownButtonFormField<int>(
+                value: _edificioSeleccionado,
                 decoration: const InputDecoration(
-                  labelText: 'Edificio (1-6)',
+                  labelText: 'Edificio',
                   border: OutlineInputBorder(),
                 ),
+                items: List.generate(6, (index) => index + 1).map((int value) {
+                  return DropdownMenuItem<int>(
+                    value: value,
+                    child: Text(value.toString()),
+                  );
+                }).toList(),
+                onChanged: (int? newValue) {
+                  setState(() {
+                    _edificioSeleccionado = newValue;
+                    _buildingController.text = newValue.toString();
+                  });
+                },
               ),
             ),
             const SizedBox(height: 10),
@@ -82,9 +94,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
                   labelText: 'Aula',
-                  hintText: _buildingController.text == '6'
-                      ? 'Ingrese cualquier número'
-                      : 'Piso-Aula (ej. 101)',
+                  hintText: hintAula,
                   border: const OutlineInputBorder(),
                 ),
               ),
@@ -105,7 +115,6 @@ class MapScreen extends StatelessWidget {
   const MapScreen({super.key});
   @override
   Widget build(BuildContext context) {
-    // 1. Definir límites del campus UNAH-VS
     final campusBounds = LatLngBounds(
       const LatLng(15.527346, -88.039573), // Suroeste
       const LatLng(15.531895, -88.035293), // Noreste
@@ -115,18 +124,11 @@ class MapScreen extends StatelessWidget {
       appBar: AppBar(title: const Text('Mapa UNAH-VS')),
       body: FlutterMap(
         options: MapOptions(
-          // 2. Centrado inicial
           initialCenter: const LatLng(15.529605, -88.037299),
           initialZoom: 16.0,
-
-          // 3. Restricción permanente al área del campus
           cameraConstraint: CameraConstraint.contain(bounds: campusBounds),
-
-          // 4. Límites de zoom permitidos
           minZoom: 14.0,
           maxZoom: 18.0,
-
-          // 5. Gestos habilitados (pan + zoom, sin rotación)
           interactionOptions: const InteractionOptions(
             flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
           ),
@@ -136,79 +138,7 @@ class MapScreen extends StatelessWidget {
             urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
             subdomains: const ['a', 'b', 'c'],
           ),
-          // Aquí puedes agregar MarkerLayer, PolygonLayer, etc.
         ],
-      ),
-    );
-  }
-}
-
-class MyApp2 extends StatelessWidget {
-  const MyApp2({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Mapa UNAH‑VS',
-      theme: ThemeData(primarySwatch: Colors.blue),
-      home: const MapScreen(),
-    );
-  }
-}
-
-class MyHomePage2 extends StatefulWidget {
-  const MyHomePage2({super.key, required this.title});
-  final String title;
-  @override
-  State<MyHomePage2> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage2> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above. The Flutter framework has been
-    // optimized to make rerunning build methods fast, so that you can just
-    // rebuild anything that needs updating rather than having to individually
-    // change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and arranges them vertically.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
       ),
     );
   }
